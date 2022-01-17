@@ -24,7 +24,7 @@ module.exports = {
       },
       rules: {
         "max-len": "off", // 關閉一行最長幾個字
-        quotes: [0, "double"],
+        quotes: [0, "double"], // 讓引號都為雙引號
       },
     },
   ],
