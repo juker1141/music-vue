@@ -65,24 +65,32 @@
           </ul>
 
           <!-- Login Form -->
-          <form v-show="tab === 'login'">
+          <VeeForm
+            v-show="tab === 'login'"
+            @submit="login"
+            :validation-loginSchema="loginSchema"
+          >
             <!-- Email -->
             <div class="mb-3">
               <label class="inline-block mb-2">Email</label>
-              <input
+              <VeeField
                 type="email"
+                name="email"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Enter Email"
               />
+              <ErrorMessage class="text-red-600" name="email" />
             </div>
             <!-- Password -->
             <div class="mb-3">
               <label class="inline-block mb-2">Password</label>
-              <input
+              <VeeField
                 type="password"
+                name="password"
                 class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
                 placeholder="Password"
               />
+              <ErrorMessage class="text-red-600" name="password" />
             </div>
             <button
               type="submit"
@@ -90,9 +98,23 @@
             >
               Submit
             </button>
-          </form>
+          </VeeForm>
           <!-- Registration Form -->
-          <VeeForm v-show="tab === 'register'" :validation-schema="schema">
+          <!-- 綁定validation-schema 是一起給予表單一個規則的物件 -->
+          <!-- initial-values會給予表單預設值，以這次例子我們只希望表單的“國家”欄位有預設值 -->
+          <div
+            class="text-white text-center font-bold p-5 mb-4"
+            v-if="regShowAlert"
+            :class="regAlertVariant"
+          >
+            {{ regAlertMsg }}
+          </div>
+          <VeeForm
+            v-show="tab === 'register'"
+            :validation-schema="schema"
+            :initial-values="userData"
+            @submit="register"
+          >
             <!-- Name -->
             <div class="mb-3">
               <label class="inline-block mb-2">Name</label>
@@ -129,12 +151,20 @@
             <div class="mb-3">
               <label class="inline-block mb-2">Password</label>
               <VeeField
-                type="password"
                 name="password"
-                class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
-                placeholder="Password"
-              />
-              <ErrorMessage class="text-red-600" name="password" />
+                :bails="false"
+                v-slot="{ field, errors }"
+              >
+                <input
+                  class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
+                  placeholder="Password"
+                  type="password"
+                  v-bind="field"
+                />
+                <div class="text-red-600" v-for="error in errors" :key="error">
+                  {{ error }}
+                </div>
+              </VeeField>
             </div>
             <!-- Confirm Password -->
             <div class="mb-3">
@@ -175,6 +205,7 @@
             </div>
             <button
               type="submit"
+              :disabled="regInSubmission"
               class="block w-full bg-purple-600 text-white py-1.5 px-3 rounded transition hover:bg-purple-700"
             >
               Submit
@@ -199,10 +230,21 @@ export default {
         email: "required|min:3|max:100|email",
         age: "required|minValue:18|maxValue:100",
         password: "required|min:3|max:100",
-        confirm_password: "confirmed:@password",
-        country: "required|excluded:Antarctica",
-        tos: "required",
+        confirm_password: "passwordsMismatch:@password",
+        country: "required|countryExcluded:Antarctica",
+        tos: "tos",
       },
+      loginSchema: {
+        email: "required|email",
+        password: "required|min:3|max:32",
+      },
+      userData: {
+        country: "USA",
+      },
+      regInSubmission: false,
+      regShowAlert: false,
+      regAlertVariant: "bg-blue-500",
+      regAlertMsg: "Please wait! Your account is being created.",
     };
   },
   computed: {
@@ -211,6 +253,19 @@ export default {
   },
   methods: {
     ...mapMutations(["toggleAuthModal"]),
+    register(values) {
+      this.regShowAlert = true;
+      this.regInSubmission = true;
+      this.regAlertVariant = "bg-blue-500";
+      this.regAlertMsg = "Please wait! Your account is being created.";
+
+      this.regAlertVariant = "bg-green-500";
+      this.regAlertMsg = "Success! Your account has been created.";
+      console.log(values);
+    },
+    login(value) {
+      console.log(value);
+    },
   },
 };
 </script>
