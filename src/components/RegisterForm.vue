@@ -132,15 +132,26 @@ export default {
     };
   },
   methods: {
-    register(values) {
+    async register(values) {
       this.regShowAlert = true;
       this.regInSubmission = true;
       this.regAlertVariant = "bg-blue-500";
       this.regAlertMsg = "Please wait! Your account is being created.";
 
+      // 嘗試註冊 firebase 用戶系統
+      // 並一併將用戶資料寫進資料庫
+      try {
+        await this.$store.dispatch("register", values);
+      } catch (error) {
+        this.regInSubmission = false;
+        this.regAlertVariant = "bg-red-500";
+        this.regAlertMsg = "An unexpected error occured. Please try again later.";
+        return; // catch 要 return 否則不會跳出去 會繼續進行下方的程式碼
+      }
+
       this.regAlertVariant = "bg-green-500";
       this.regAlertMsg = "Success! Your account has been created.";
-      console.log(values);
+      window.location.reload();
     },
   },
 };

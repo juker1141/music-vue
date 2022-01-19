@@ -56,15 +56,28 @@ export default {
     };
   },
   methods: {
-    login(value) {
+    async login(values) {
       this.loginShowAlert = true;
       this.loginInSubmission = true;
       this.loginAlertVariant = "bg-blue-500";
       this.loginAlertMsg = "Please wait! We are logging you in.";
 
-      // this.loginAlertVariant = "bg-green-500";
-      // this.loginAlertMsg = "Success! Your are now logged in.";
-      console.log(value);
+      // 嘗試登入 firebase
+      try {
+        await this.$store.dispatch("login", values);
+      } catch (error) {
+        // 失敗就顯示錯誤，並跳出流程
+        this.loginInSubmission = false;
+        this.loginAlertVariant = "bg-red-500";
+        this.loginAlertMsg = "Invalid login details.";
+        // 若 catch 沒有 return，會繼續執行下面的程式碼
+        return;
+      }
+
+      // 成功就 reload page
+      this.loginAlertVariant = "bg-green-500";
+      this.loginAlertMsg = "Success! Your are now logged in.";
+      window.location.reload();
     },
   },
 };
