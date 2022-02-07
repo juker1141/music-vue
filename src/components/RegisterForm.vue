@@ -66,11 +66,11 @@
       <label class="inline-block mb-2">Confirm Password</label>
       <VeeField
         type="password"
-        name="confirm_password"
+        name="confirmPassword"
         class="block w-full py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
         placeholder="Confirm Password"
       />
-      <ErrorMessage class="text-red-600" name="confirm_password" />
+      <ErrorMessage class="text-red-600" name="confirmPassword" />
     </div>
     <!-- Country -->
     <div class="mb-3">
@@ -118,7 +118,7 @@ export default {
         email: "required|min:3|max:100|email",
         age: "required|minValue:18|maxValue:100",
         password: "required|min:3|max:100",
-        confirm_password: "passwordsMismatch:@password",
+        confirmPassword: "passwordsMismatch:@password",
         country: "required|countryExcluded:Antarctica",
         tos: "tos",
       },
