@@ -19,16 +19,20 @@
       >
         <h5>Drop your files here</h5>
       </div>
+      <input type="file" multiple @change="upload($event)" />
       <hr class="my-6" />
       <!-- Progess Bars -->
       <div class="mb-4" v-for="upload in uploads" :key="upload.name">
         <!-- File Name -->
-        <div class="font-bold text-sm">{{ upload.name }}</div>
+        <div class="font-bold text-sm" :class="upload.textClass">
+          <i :class="upload.icon"></i>
+          {{ upload.name }}
+        </div>
         <div class="flex h-4 overflow-hidden bg-gray-200 rounded">
           <!-- Inner Progress Bar -->
           <div
-            class="transition-all progress-bar bg-blue-400"
-            :class="'bg-blue-400'"
+            class="transition-all progress-bar"
+            :class="upload.variant"
             :style="{ width: `${upload.currentProgress}%` }"
           ></div>
         </div>
@@ -38,7 +42,7 @@
 </template>
 
 <script>
-import { storage } from "@/includes/firebase";
+import { storage, auth, songsCollection } from "@/includes/firebase";
 
 export default {
   name: "Upload",
@@ -54,7 +58,9 @@ export default {
 
       // 因為目標檔案其實不是一個陣列
       // 透過這個方式讓他轉為一個陣列
-      const files = [...$event.dataTransfer.files];
+      const files = $event.dataTransfer
+        ? [...$event.dataTransfer.files]
+        : [...$event.target.files];
 
       files.forEach((file) => {
         if (file.type !== "audio/mpeg") return;
@@ -74,14 +80,53 @@ export default {
           textClass: "",
         }) - 1;
 
-        task.on("state_changed", (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          this.uploads[uploadIndex].currentProgress = progress;
-        });
+        // 第一個 function 是在檔案狀態改變, 也就是上傳的過程
+        // 第二個 function 是在檔案狀態改變且失敗, 也就是上傳失敗
+        // 第二個 function 是在檔案狀態改變且成功, 也就是上傳成功
+        task.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            this.uploads[uploadIndex].currentProgress = progress;
+          },
+          (error) => {
+            this.uploads[uploadIndex].variant = "bg-red-400";
+            this.uploads[uploadIndex].icon = "fas fa-times";
+            this.uploads[uploadIndex].textClass = "text-red-400";
+            console.log(error);
+          },
+          async () => {
+            const song = {
+              uid: auth.currentUser.uid,
+              displayName: auth.currentUser.displayName,
+              originalName: task.snapshot.ref.name,
+              modifiedName: task.snapshot.ref.name,
+              genre: "",
+              commentCount: 0,
+            };
+
+            song.url = await task.snapshot.ref.getDownloadURL();
+            await songsCollection.add(song);
+
+            this.uploads[uploadIndex].variant = "bg-green-400";
+            this.uploads[uploadIndex].icon = "fas fa-check";
+            this.uploads[uploadIndex].textClass = "text-green-400";
+          },
+        );
       });
 
       console.log(files);
     },
+    // cancelUploads() {
+    //   this.uploads.forEach((upload) => {
+    //     upload.task.cancel();
+    //   });
+    // },
+  },
+  beforeUnmount() {
+    this.uploads.forEach((upload) => {
+      upload.task.cancel();
+    });
   },
 };
 </script>

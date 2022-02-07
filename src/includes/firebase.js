@@ -21,7 +21,8 @@ const storage = firebase.storage(); // firebase 的儲存功能
 // firebase 匯出資料庫中使用者的集合
 // 若沒有此集合，firebase 會自動創造使用者的集合
 const userCollection = db.collection("users");
+const songsCollection = db.collection("songs");
 
 // 匯出要使用的功能
 // eslint-disable-next-line object-curly-newline
-export { auth, db, userCollection, storage };
+export { auth, db, userCollection, songsCollection, storage };
