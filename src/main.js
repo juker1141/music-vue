@@ -4,8 +4,10 @@ import router from "./router";
 import store from "./store";
 import VeeValidatePlugin from "./includes/validation";
 import { auth } from "./includes/firebase";
+import Icon from "./directives/icon";
 import "./assets/tailwind.css";
 import "./assets/main.css";
+import i18n from "./i18n";
 
 let app;
 // 先掛載 firebase 的監聽，再去建立 vue app
@@ -14,9 +16,12 @@ auth.onAuthStateChanged(() => {
   if (!app) {
     app = createApp(App);
 
+    app.use(i18n); // 匯入 i18n 套件
+
     app.use(store); // 匯入 Vuex
     app.use(router); // 匯入 Vue router
     app.use(VeeValidatePlugin); // 匯入表單驗證系統
+    app.directive("icon", Icon);
 
     app.mount("#app");
   }
