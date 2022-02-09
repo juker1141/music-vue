@@ -22,6 +22,7 @@
           <!-- Song Info -->
           <div class="text-3xl font-bold">{{ song.modifiedName }}</div>
           <div>{{ song.genre }}</div>
+          <div class="song-price">{{ $n(1, "currency") }}</div>
         </div>
       </div>
     </section>
@@ -32,7 +33,13 @@
       >
         <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
           <!-- Comment Count -->
-          <span class="card-title">Comments ({{ song.commentCount }})</span>
+          <span class="card-title">
+            {{
+              $tc("song.commentCount", song.commentCount, {
+                count: song.commentCount,
+              })
+            }}
+          </span>
           <i class="fa fa-comments float-right text-green-400 text-2xl"></i>
         </div>
         <div class="p-6">
@@ -86,7 +93,6 @@
           <div class="font-bold">{{ comment.name }}</div>
           <time>{{ comment.datePosted }}</time>
         </div>
-
         <p>
           {{ comment.content }}
         </p>
@@ -116,7 +122,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(["userLoggedIn"]),
+    ...mapState({
+      userLoggedIn: (state) => state.auth.userLoggedIn,
+    }),
     ...mapGetters(["playing"]),
     sortedComments() {
       // 使用空的 slice 來創造一個新的陣列
@@ -189,22 +197,30 @@ export default {
       });
     },
   },
-  async created() {
-    const docSnapshot = await songsCollection.doc(this.$route.params.id).get();
+  async beforeRouteEnter(to, from, next) {
+    // 為了讓元素一起載入，使用 beforeRouteEnter 來抓資料
+    // 因為是比 created 還要早的路由守衛，所以根本沒有 this
+    // const docSnapshot = await songsCollection.doc(this.$route.params.id).get();
+    const docSnapshot = await songsCollection.doc(to.params.id).get();
 
-    // 若是用戶去了已不存在資料庫的歌曲頁面
-    // 將會被踢回首頁
-    if (!docSnapshot.exists) {
-      this.$router.push({ name: "home" });
-      return;
-    }
+    next((vm) => {
+      // 若是用戶去了已不存在資料庫的歌曲頁面
+      // 將會被踢回首頁
+      if (!docSnapshot.exists) {
+        vm.$router.push({ name: "home" });
+        return;
+      }
 
-    const { sort } = this.$route.query;
+      const { sort } = vm.$route.query;
 
-    this.sort = sort === "1" || sort === "2" ? sort : "1";
+      // eslint-disable-next-line no-param-reassign
+      vm.sort = sort === "1" || sort === "2" ? sort : "1";
 
-    this.song = docSnapshot.data();
-    this.getComments();
+      // snapshot 要呼叫 data 才是我們需要的資料
+      // eslint-disable-next-line no-param-reassign
+      vm.song = docSnapshot.data();
+      vm.getComments();
+    });
   },
 };
 </script>

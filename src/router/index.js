@@ -61,7 +61,7 @@ router.beforeEach((to, from, next) => {
     return;
   }
   // 剩下"有該屬性"後，檢查是否登入，如果沒有登入就導回去首頁
-  if (store.state.userLoggedIn) {
+  if (store.state.auth.userLoggedIn) {
     next();
   } else {
     next({ name: "home" });

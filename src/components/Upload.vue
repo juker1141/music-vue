@@ -71,6 +71,18 @@ export default {
       files.forEach((file) => {
         if (file.type !== "audio/mpeg") return;
 
+        if (!navigator.onLine) {
+          this.uploads.push({
+            task: {},
+            currentProgress: 100,
+            name: file.name,
+            variant: "bg-red-400",
+            icon: "fas fa-times",
+            textClass: "text-red-400",
+          });
+          return;
+        }
+
         // 等同於我們的 firebase 儲存桶 - music-aeb3c.appspot.com
         const storageRef = storage.ref();
         // child 會創建父 Ref 下的路由 - music-aeb3c.appspot.com/songs/example.mp3

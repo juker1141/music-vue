@@ -7,7 +7,9 @@ import { auth } from "./includes/firebase";
 import Icon from "./directives/icon";
 import "./assets/tailwind.css";
 import "./assets/main.css";
-import i18n from "./i18n";
+import i18n from "./includes/i18n";
+import "./registerServiceWorker";
+import GlobalComponents from "./includes/_globals";
 
 let app;
 // 先掛載 firebase 的監聽，再去建立 vue app
@@ -21,6 +23,7 @@ auth.onAuthStateChanged(() => {
     app.use(store); // 匯入 Vuex
     app.use(router); // 匯入 Vue router
     app.use(VeeValidatePlugin); // 匯入表單驗證系統
+    app.use(GlobalComponents);
     app.directive("icon", Icon);
 
     app.mount("#app");

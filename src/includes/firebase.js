@@ -18,6 +18,10 @@ const auth = firebase.auth(); // firebase 用戶系統
 const db = firebase.firestore(); // firebase 資料庫
 const storage = firebase.storage(); // firebase 的儲存功能
 
+db.enablePersistence().catch((error) => {
+  console.log(`Firebase persistence error ${error.code}`);
+});
+
 // firebase 匯出資料庫中使用者的集合
 // 若沒有此集合，firebase 會自動創造使用者的集合
 const userCollection = db.collection("users");

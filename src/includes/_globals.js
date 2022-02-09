@@ -1,0 +1,24 @@
+/* eslint-disable comma-dangle */
+import _ from "lodash";
+
+function install(app) {
+  const baseComponents = require.context(
+    "../components/base/",
+    false,
+    /[A-Za-z0-9-_,\s]+\.vue$/i
+  );
+
+  baseComponents.keys().forEach((fileName) => {
+    const componentConfig = baseComponents(fileName);
+    const componentName = _.upperFirst(
+      _.camelCase(fileName.replace(/^\.\//, "").replace(/\.\w+$/, ""))
+    );
+
+    // export default
+    app.component(
+      `Base${componentName}`,
+      componentConfig.default || componentConfig
+    );
+  });
+}
+export default { install };

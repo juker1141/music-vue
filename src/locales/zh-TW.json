@@ -1,0 +1,15 @@
+{
+  "home": {
+    "listen": "來聽音樂吧"
+  },
+  "register": {
+    "TOS": "",
+    "accept": ""
+  },
+  "rigister": {
+    "accept": ""
+  },
+  "song": {
+    "commentCount": "沒有留言 | 1 則留言 | {count} 則留言"
+  }
+}
