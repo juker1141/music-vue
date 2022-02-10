@@ -3,9 +3,11 @@
 
   <!-- 由 router 顯示的元件內容 -->
   <router-view v-slot="{ Component }">
-    <transition name="fade" mode="out-in">
+    <!-- <transition name="fade" mode="out-in">
       <component :is="Component"></component>
-    </transition>
+    </transition> -->
+
+    <component :is="Component"></component>
   </router-view>
 
   <AuthModal />
