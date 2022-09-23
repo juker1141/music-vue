@@ -10,7 +10,7 @@
         <!-- Play/Pause Button -->
         <button
           type="button"
-          class="z-50 h-24 w-24 text-3xl bg-white text-black rounded-full focus:outline-none"
+          class="z-50 p-8 text-3xl bg-white text-black rounded-full focus:outline-none flex items-center justify-center"
           @click.prevent="newSong(song)"
         >
           <i
